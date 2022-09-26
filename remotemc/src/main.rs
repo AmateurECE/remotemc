@@ -25,23 +25,40 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
-use axum::{
-    routing::get, Router,
-};
+use axum::{routing::get, Router};
+use clap::{self, Parser};
+use serde::Deserialize;
+use std::fs::File;
 
-mod service_root;
-mod computer_system_collection;
 mod computer_system;
+mod computer_system_collection;
+mod service_root;
+
+#[derive(clap::Parser)]
+#[clap(author, version)]
+struct Args {
+    /// Configuration file
+    #[clap(value_parser)]
+    pub file: String,
+}
+
+#[derive(Deserialize)]
+struct Configuration {
+    pub listen_address: String,
+}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt::init();
+    let args = Args::parse();
+    let configuration: Configuration =
+        serde_yaml::from_reader(File::open(&args.file)?)?;
     let app = Router::new()
         .route("/redfish/v1", get(service_root::get))
         .route("/redfish/v1/Systems", get(computer_system_collection::get))
         .route("/redfish/v1/Systems/1", get(computer_system::get));
 
-    axum::Server::bind(&"0.0.0.0:3000".parse()?)
+    axum::Server::bind(&configuration.listen_address.parse()?)
         .serve(app.into_make_service())
         .await?;
     Ok(())
