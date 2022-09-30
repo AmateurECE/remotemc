@@ -8,7 +8,7 @@
 //
 // CREATED:         09/29/2022
 //
-// LAST EDITED:     09/29/2022
+// LAST EDITED:     09/30/2022
 //
 // Copyright 2022, Ethan D. Twardy
 //
@@ -28,7 +28,7 @@
 
 use serde::{Serialize, Deserialize};
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Deserialize, Serialize)]
 pub struct ObjectLink {
     #[serde(rename = "@odata.id")]
     pub id: String,

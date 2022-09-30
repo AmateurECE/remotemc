@@ -7,7 +7,7 @@
 //
 // CREATED:         09/26/2022
 //
-// LAST EDITED:     09/29/2022
+// LAST EDITED:     09/30/2022
 //
 // Copyright 2022, Ethan D. Twardy
 //
@@ -25,12 +25,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
-use axum::Json;
 use crate::object_link::ObjectLink;
 use serde::Serialize;
 use uuid::Uuid;
+use derive_builder::Builder;
 
-#[derive(Default, Serialize)]
+#[derive(Builder, Clone, Default, Serialize)]
 pub struct ServiceRoot {
     #[serde(rename = "@odata.type")]
     pub odata_type: String,
@@ -44,35 +44,6 @@ pub struct ServiceRoot {
     pub uuid: Uuid,
     #[serde(rename = "Systems")]
     pub systems: ObjectLink,
-}
-
-#[derive(Default)]
-pub struct ServiceRootBuilder {
-    has_systems: bool,
-}
-
-impl ServiceRoot {
-    pub fn builder() -> ServiceRootBuilder {
-        ServiceRootBuilder::default()
-    }
-}
-
-impl ServiceRootBuilder {
-    pub fn with_systems(&mut self) -> &mut ServiceRootBuilder {
-        self.has_systems = true;
-        self
-    }
-
-    pub fn build(&self) -> ServiceRoot {
-        ServiceRoot {
-            odata_type: "".to_string(),
-            id: "".to_string(),
-            name: "".to_string(),
-            redfish_version: "".to_string(),
-            uuid: Uuid::new_v4(),
-            systems: ObjectLink::from(""),
-        }
-    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
