@@ -7,7 +7,7 @@
 //
 // CREATED:         09/26/2022
 //
-// LAST EDITED:     09/26/2022
+// LAST EDITED:     09/29/2022
 //
 // Copyright 2022, Ethan D. Twardy
 //
@@ -25,20 +25,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
-use axum::{routing::get, Router};
+use axum::{routing::get, Json, Router};
 use clap::{self, Parser};
 use serde::Deserialize;
 use std::fs::File;
 
 mod computer_system;
 mod computer_system_collection;
+mod object_link;
 mod service_root;
+
+use service_root::ServiceRootBuilder;
 
 #[derive(clap::Parser)]
 #[clap(author, version)]
 struct Args {
-    /// Configuration file
     #[clap(value_parser)]
+    /// Configuration file
     pub file: String,
 }
 
@@ -54,7 +57,9 @@ async fn main() -> anyhow::Result<()> {
     let configuration: Configuration =
         serde_yaml::from_reader(File::open(&args.file)?)?;
     let app = Router::new()
-        .route("/redfish/v1", get(service_root::get))
+        .route("/redfish/v1", get(|| async {
+            Json(ServiceRootBuilder::default().build())
+        }))
         .route("/redfish/v1/Systems", get(computer_system_collection::get))
         .route("/redfish/v1/Systems/1", get(computer_system::get));
 

@@ -7,7 +7,7 @@
 //
 // CREATED:         09/26/2022
 //
-// LAST EDITED:     09/26/2022
+// LAST EDITED:     09/29/2022
 //
 // Copyright 2022, Ethan D. Twardy
 //
@@ -26,13 +26,53 @@
 ////
 
 use axum::Json;
+use crate::object_link::ObjectLink;
 use serde::Serialize;
+use uuid::Uuid;
 
-#[derive(Serialize)]
-pub struct ServiceRoot;
+#[derive(Default, Serialize)]
+pub struct ServiceRoot {
+    #[serde(rename = "@odata.type")]
+    pub odata_type: String,
+    #[serde(rename = "Id")]
+    pub id: String,
+    #[serde(rename = "Name")]
+    pub name: String,
+    #[serde(rename = "RedfishVersion")]
+    pub redfish_version: String,
+    #[serde(rename = "UUID")]
+    pub uuid: Uuid,
+    #[serde(rename = "Systems")]
+    pub systems: ObjectLink,
+}
 
-pub async fn get() -> Json<ServiceRoot> {
-    todo!()
+#[derive(Default)]
+pub struct ServiceRootBuilder {
+    has_systems: bool,
+}
+
+impl ServiceRoot {
+    pub fn builder() -> ServiceRootBuilder {
+        ServiceRootBuilder::default()
+    }
+}
+
+impl ServiceRootBuilder {
+    pub fn with_systems(&mut self) -> &mut ServiceRootBuilder {
+        self.has_systems = true;
+        self
+    }
+
+    pub fn build(&self) -> ServiceRoot {
+        ServiceRoot {
+            odata_type: "".to_string(),
+            id: "".to_string(),
+            name: "".to_string(),
+            redfish_version: "".to_string(),
+            uuid: Uuid::new_v4(),
+            systems: ObjectLink::from(""),
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
