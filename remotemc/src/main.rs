@@ -25,9 +25,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
+use ::serde::Deserialize;
 use axum::{routing::get, Json, Router};
 use clap::{self, Parser};
-use ::serde::Deserialize;
 use std::fs::File;
 use uuid::Uuid;
 
@@ -62,47 +62,50 @@ async fn main() -> anyhow::Result<()> {
     let configuration: Configuration =
         serde_yaml::from_reader(File::open(&args.file)?)?;
 
+    let service_root_path = "/redfish/v1".to_string();
+    let computer_system_collection_path =
+        service_root_path.to_owned() + "/Systems";
+    let computer_system_path =
+        computer_system_collection_path.to_owned() + "/1";
+
     let service_root = ServiceRootBuilder::default()
-        .odata_type("#ServiceRoot.v1_12_0.ServiceRoot".to_string())
         .id("RootService".to_string())
         .name("Root Service".to_string())
         .redfish_version("1.6.0".to_string())
         .uuid(Uuid::new_v4())
-        .systems(ObjectLink::from("/redfish/v1/Systems"))
-        .odata_id("/redfish/v1".to_string())
+        .systems(ObjectLink::from(computer_system_collection_path.as_str()))
+        .odata_id(service_root_path.clone())
         .build()?;
 
     let computer_system_collection = ComputerSystemCollectionBuilder::default()
-        .odata_type("#ComputerSystemCollection.ComputerSystemCollection"
-                    .to_string())
         .name("Computer System Collection".to_string())
         .count(1)
-        .members(vec![
-            ObjectLink::from("/redfish/v1/Systems/1")
-        ])
-        .odata_id("/redfish/v1/Systems".to_string())
+        .members(vec![ObjectLink::from(computer_system_path.as_str())])
+        .odata_id(computer_system_collection_path.clone())
         .build()?;
 
     let computer_system = ComputerSystemBuilder::default()
-        .odata_type("#ComputerSystem.v1_16_1.ComputerSystem".to_string())
         .name("The Server".to_string())
         .system_type("Physical".to_string())
         .uuid(Uuid::new_v4())
         .host_name("twardyece.com".to_string())
         .power_state(true)
-        .odata_id("/redfish/v1/Systems/1".to_string())
+        .odata_id(computer_system_path.clone())
         .build()?;
 
     let app = Router::new()
-        .route("/redfish/v1", get(|| async move {
-            Json(service_root.clone())
-        }))
-        .route("/redfish/v1/Systems", get(|| async move {
-            Json(computer_system_collection.clone())
-        }))
-        .route("/redfish/v1/Systems/1", get(|| async move {
-            Json(computer_system.clone())
-        }));
+        .route(
+            &service_root_path,
+            get(|| async move { Json(service_root.clone()) }),
+        )
+        .route(
+            &computer_system_collection_path,
+            get(|| async move { Json(computer_system_collection.clone()) }),
+        )
+        .route(
+            &computer_system_path,
+            get(|| async move { Json(computer_system.clone()) }),
+        );
 
     axum::Server::bind(&configuration.listen_address.parse()?)
         .serve(app.into_make_service())

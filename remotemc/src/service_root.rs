@@ -27,11 +27,15 @@
 
 use crate::object_link::ObjectLink;
 use ::serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use derive_builder::Builder;
+use uuid::Uuid;
 
 #[derive(Builder, Clone, Default, Deserialize, Serialize)]
 pub struct ServiceRoot {
+    #[builder(
+        setter(skip),
+        default = "\"#ServiceRoot.v1_12_0.ServiceRoot\".to_string()"
+    )]
     #[serde(rename = "@odata.type")]
     pub odata_type: String,
     #[serde(rename = "Id")]

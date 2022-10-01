@@ -25,11 +25,15 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
+use serde::{
+    de::{self, Deserializer, Visitor},
+    ser::Serializer,
+};
 use std::fmt;
-use serde::{de::{self, Deserializer, Visitor}, ser::Serializer};
 
 pub fn serialize<S>(value: &bool, ser: S) -> Result<S::Ok, S::Error>
-where S: Serializer
+where
+    S: Serializer,
 {
     match value {
         false => ser.serialize_str("Off"),
@@ -39,7 +43,7 @@ where S: Serializer
 
 struct OnOffVisitor;
 
-impl <'de> Visitor<'de> for OnOffVisitor {
+impl<'de> Visitor<'de> for OnOffVisitor {
     type Value = bool;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
@@ -47,7 +51,8 @@ impl <'de> Visitor<'de> for OnOffVisitor {
     }
 
     fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
-    where E: de::Error
+    where
+        E: de::Error,
     {
         match value {
             "Off" => Ok(false),
@@ -58,7 +63,8 @@ impl <'de> Visitor<'de> for OnOffVisitor {
 }
 
 pub fn deserialize<'de, D>(deser: D) -> Result<bool, D::Error>
-where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     deser.deserialize_bool(OnOffVisitor)
 }

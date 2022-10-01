@@ -25,12 +25,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
+use crate::object_link::ObjectLink;
 use ::serde::{Deserialize, Serialize};
 use derive_builder::Builder;
-use crate::object_link::ObjectLink;
 
 #[derive(Builder, Clone, Default, Deserialize, Serialize)]
 pub struct ComputerSystemCollection {
+    #[builder(
+        setter(skip),
+        default = "\"#ComputerSystemCollection.ComputerSystemCollection\".to_string()"
+    )]
     #[serde(rename = "@odata.type")]
     pub odata_type: String,
     #[serde(rename = "Name")]

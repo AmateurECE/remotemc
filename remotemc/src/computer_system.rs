@@ -25,13 +25,17 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
+use crate::serde;
 use ::serde::{Deserialize, Serialize};
 use derive_builder::Builder;
 use uuid::Uuid;
-use crate::serde;
 
 #[derive(Builder, Clone, Default, Deserialize, Serialize)]
 pub struct ComputerSystem {
+    #[builder(
+        setter(skip),
+        default = "\"#ComputerSystem.v1_16_1.ComputerSystem\".to_string()"
+    )]
     #[serde(rename = "@odata.type")]
     pub odata_type: String,
 

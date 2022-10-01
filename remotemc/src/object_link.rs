@@ -26,7 +26,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Deserialize, Serialize)]
 pub struct ObjectLink {
@@ -37,7 +37,7 @@ pub struct ObjectLink {
 impl From<&str> for ObjectLink {
     fn from(value: &str) -> Self {
         Self {
-            id: value.to_string()
+            id: value.to_string(),
         }
     }
 }
