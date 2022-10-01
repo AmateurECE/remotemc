@@ -28,13 +28,16 @@
 use ::serde::Deserialize;
 use axum::{routing::get, Json, Router};
 use clap::{self, Parser};
-use std::fs::File;
-use uuid::Uuid;
-
 use redfish::{
     ComputerSystemBuilder, ComputerSystemCollectionBuilder, ObjectLink,
     ServiceRootBuilder,
 };
+use std::fs::File;
+use uuid::Uuid;
+
+mod remote_computer_system;
+
+use remote_computer_system::RemoteComputerSystem;
 
 #[derive(clap::Parser)]
 #[clap(author, version)]
@@ -79,6 +82,7 @@ async fn main() -> anyhow::Result<()> {
         .build()?;
 
     let computer_system = ComputerSystemBuilder::default()
+        .id("1".to_string())
         .name("The Server".to_string())
         .system_type("Physical".to_string())
         .uuid(Uuid::new_v4())
@@ -86,6 +90,7 @@ async fn main() -> anyhow::Result<()> {
         .power_state(true)
         .odata_id(computer_system_path.clone())
         .build()?;
+    let mut remote_system = RemoteComputerSystem::new(computer_system);
 
     let app = Router::new()
         .route(
@@ -98,7 +103,7 @@ async fn main() -> anyhow::Result<()> {
         )
         .route(
             &computer_system_path,
-            get(|| async move { Json(computer_system.clone()) }),
+            get(|| async move { Json(remote_system.status()) }),
         );
 
     axum::Server::bind(&configuration.listen_address.parse()?)
