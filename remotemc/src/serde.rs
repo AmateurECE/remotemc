@@ -1,11 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
-// NAME:            computer_system_collection.rs
+// NAME:            serde.rs
 //
 // AUTHOR:          Ethan D. Twardy <ethan.twardy@gmail.com>
 //
-// DESCRIPTION:     Service root implementation.
+// DESCRIPTION:     Module for serialization and deserialization of Redfish
+//                  types
 //
-// CREATED:         09/26/2022
+// CREATED:         10/01/2022
 //
 // LAST EDITED:     10/01/2022
 //
@@ -25,22 +26,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
-use ::serde::{Deserialize, Serialize};
-use derive_builder::Builder;
-use crate::object_link::ObjectLink;
-
-#[derive(Builder, Clone, Default, Deserialize, Serialize)]
-pub struct ComputerSystemCollection {
-    #[serde(rename = "@odata.type")]
-    pub odata_type: String,
-    #[serde(rename = "Name")]
-    pub name: String,
-    #[serde(rename = "Members@odata.count")]
-    pub count: i32,
-    #[serde(rename = "Members")]
-    pub members: Vec<ObjectLink>,
-    #[serde(rename = "@odata.id")]
-    pub odata_id: String,
-}
+pub mod off_on;
 
 ///////////////////////////////////////////////////////////////////////////////

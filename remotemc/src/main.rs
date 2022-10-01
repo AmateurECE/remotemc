@@ -7,7 +7,7 @@
 //
 // CREATED:         09/26/2022
 //
-// LAST EDITED:     09/30/2022
+// LAST EDITED:     10/01/2022
 //
 // Copyright 2022, Ethan D. Twardy
 //
@@ -27,15 +27,17 @@
 
 use axum::{routing::get, Json, Router};
 use clap::{self, Parser};
-use serde::Deserialize;
+use ::serde::Deserialize;
 use std::fs::File;
 use uuid::Uuid;
 
 mod computer_system;
 mod computer_system_collection;
 mod object_link;
+mod serde;
 mod service_root;
 
+use computer_system::ComputerSystemBuilder;
 use computer_system_collection::ComputerSystemCollectionBuilder;
 use object_link::ObjectLink;
 use service_root::ServiceRootBuilder;
@@ -81,6 +83,16 @@ async fn main() -> anyhow::Result<()> {
         .odata_id("/redfish/v1/Systems".to_string())
         .build()?;
 
+    let computer_system = ComputerSystemBuilder::default()
+        .odata_type("#ComputerSystem.v1_16_1.ComputerSystem".to_string())
+        .name("The Server".to_string())
+        .system_type("Physical".to_string())
+        .uuid(Uuid::new_v4())
+        .host_name("twardyece.com".to_string())
+        .power_state(true)
+        .odata_id("/redfish/v1/Systems/1".to_string())
+        .build()?;
+
     let app = Router::new()
         .route("/redfish/v1", get(|| async move {
             Json(service_root.clone())
@@ -88,7 +100,9 @@ async fn main() -> anyhow::Result<()> {
         .route("/redfish/v1/Systems", get(|| async move {
             Json(computer_system_collection.clone())
         }))
-        .route("/redfish/v1/Systems/1", get(computer_system::get));
+        .route("/redfish/v1/Systems/1", get(|| async move {
+            Json(computer_system.clone())
+        }));
 
     axum::Server::bind(&configuration.listen_address.parse()?)
         .serve(app.into_make_service())

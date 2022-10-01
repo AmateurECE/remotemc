@@ -7,7 +7,7 @@
 //
 // CREATED:         09/26/2022
 //
-// LAST EDITED:     09/30/2022
+// LAST EDITED:     10/01/2022
 //
 // Copyright 2022, Ethan D. Twardy
 //
@@ -26,7 +26,7 @@
 ////
 
 use crate::object_link::ObjectLink;
-use serde::{Deserialize, Serialize};
+use ::serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use derive_builder::Builder;
 
