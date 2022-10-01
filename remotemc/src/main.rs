@@ -31,16 +31,10 @@ use clap::{self, Parser};
 use std::fs::File;
 use uuid::Uuid;
 
-mod computer_system;
-mod computer_system_collection;
-mod object_link;
-mod serde;
-mod service_root;
-
-use computer_system::ComputerSystemBuilder;
-use computer_system_collection::ComputerSystemCollectionBuilder;
-use object_link::ObjectLink;
-use service_root::ServiceRootBuilder;
+use redfish::{
+    ComputerSystemBuilder, ComputerSystemCollectionBuilder, ObjectLink,
+    ServiceRootBuilder,
+};
 
 #[derive(clap::Parser)]
 #[clap(author, version)]
