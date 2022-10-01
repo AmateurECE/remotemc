@@ -36,6 +36,7 @@ mod computer_system_collection;
 mod object_link;
 mod service_root;
 
+use computer_system_collection::ComputerSystemCollectionBuilder;
 use object_link::ObjectLink;
 use service_root::ServiceRootBuilder;
 
@@ -66,13 +67,27 @@ async fn main() -> anyhow::Result<()> {
         .redfish_version("1.6.0".to_string())
         .uuid(Uuid::new_v4())
         .systems(ObjectLink::from("/redfish/v1/Systems"))
+        .odata_id("/redfish/v1".to_string())
+        .build()?;
+
+    let computer_system_collection = ComputerSystemCollectionBuilder::default()
+        .odata_type("#ComputerSystemCollection.ComputerSystemCollection"
+                    .to_string())
+        .name("Computer System Collection".to_string())
+        .count(1)
+        .members(vec![
+            ObjectLink::from("/redfish/v1/Systems/1")
+        ])
+        .odata_id("/redfish/v1/Systems".to_string())
         .build()?;
 
     let app = Router::new()
         .route("/redfish/v1", get(|| async move {
             Json(service_root.clone())
         }))
-        .route("/redfish/v1/Systems", get(computer_system_collection::get))
+        .route("/redfish/v1/Systems", get(|| async move {
+            Json(computer_system_collection.clone())
+        }))
         .route("/redfish/v1/Systems/1", get(computer_system::get));
 
     axum::Server::bind(&configuration.listen_address.parse()?)

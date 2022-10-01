@@ -7,7 +7,7 @@
 //
 // CREATED:         09/26/2022
 //
-// LAST EDITED:     09/26/2022
+// LAST EDITED:     09/30/2022
 //
 // Copyright 2022, Ethan D. Twardy
 //
@@ -25,14 +25,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
-use axum::Json;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+use derive_builder::Builder;
+use crate::object_link::ObjectLink;
 
-#[derive(Serialize)]
-pub struct ComputerSystemCollection;
-
-pub async fn get() -> Json<ComputerSystemCollection> {
-    todo!()
+#[derive(Builder, Clone, Default, Deserialize, Serialize)]
+pub struct ComputerSystemCollection {
+    #[serde(rename = "@odata.type")]
+    pub odata_type: String,
+    #[serde(rename = "Name")]
+    pub name: String,
+    #[serde(rename = "Members@odata.count")]
+    pub count: i32,
+    #[serde(rename = "Members")]
+    pub members: Vec<ObjectLink>,
+    #[serde(rename = "@odata.id")]
+    pub odata_id: String,
 }
 
 ///////////////////////////////////////////////////////////////////////////////
