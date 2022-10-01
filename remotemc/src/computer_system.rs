@@ -49,32 +49,7 @@ pub struct ComputerSystem {
     #[builder(default)]
     #[serde(rename = "SystemType")]
     pub system_type: String,
-    #[builder(default)]
-    #[serde(rename = "AssetTag")]
-    pub asset_tag: String,
 
-    #[builder(default)]
-    #[serde(rename = "Manufacturer")]
-    pub manufacturer: String,
-    #[builder(default)]
-    #[serde(rename = "Model")]
-    pub model: String,
-    #[builder(default)]
-    #[serde(rename = "SubModel")]
-    pub sub_model: String,
-    #[builder(default)]
-    #[serde(rename = "SKU")]
-    pub sku: String,
-    #[builder(default)]
-    #[serde(rename = "SerialNumber")]
-    pub serial_number: String,
-    #[builder(default)]
-    #[serde(rename = "PartNumber")]
-    pub part_number: String,
-
-    #[builder(default)]
-    #[serde(rename = "Description")]
-    pub description: String,
     #[builder(default)]
     #[serde(rename = "UUID")]
     pub uuid: Uuid,
