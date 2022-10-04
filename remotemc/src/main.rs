@@ -7,7 +7,7 @@
 //
 // CREATED:         09/26/2022
 //
-// LAST EDITED:     10/01/2022
+// LAST EDITED:     10/04/2022
 //
 // Copyright 2022, Ethan D. Twardy
 //
@@ -33,8 +33,10 @@ use redfish::{
     ServiceRootBuilder,
 };
 use std::fs::File;
+use std::net::Ipv4Addr;
 use uuid::Uuid;
 
+mod ping;
 mod remote_computer_system;
 
 use remote_computer_system::RemoteComputerSystem;
@@ -50,6 +52,7 @@ struct Args {
 #[derive(Deserialize)]
 struct Configuration {
     pub listen_address: String,
+    pub remote_address: Ipv4Addr,
 }
 
 #[tokio::main]
@@ -90,7 +93,10 @@ async fn main() -> anyhow::Result<()> {
         .power_state(true)
         .odata_id(computer_system_path.clone())
         .build()?;
-    let mut remote_system = RemoteComputerSystem::new(computer_system);
+    let mut remote_system = RemoteComputerSystem::new(
+        computer_system,
+        configuration.remote_address,
+    );
 
     let app = Router::new()
         .route(
@@ -103,7 +109,7 @@ async fn main() -> anyhow::Result<()> {
         )
         .route(
             &computer_system_path,
-            get(|| async move { Json(remote_system.status()) }),
+            get(|| async move { Json(remote_system.status().await) }),
         );
 
     axum::Server::bind(&configuration.listen_address.parse()?)

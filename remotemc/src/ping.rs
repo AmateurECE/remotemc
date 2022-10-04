@@ -1,10 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-// NAME:            remote_computer_system.rs
+// NAME:            ping.rs
 //
 // AUTHOR:          Ethan D. Twardy <ethan.twardy@gmail.com>
 //
-// DESCRIPTION:     Implements functionality for monitoring of a remote system
-//                  and exposes a Redfish ComputerSystem.
+// DESCRIPTION:     Module for sending ICMP ECHO_REQUEST messages to a remote
+//                  host.
 //
 // CREATED:         10/01/2022
 //
@@ -26,28 +26,18 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ////
 
-use crate::ping;
-use redfish::ComputerSystem;
 use std::net::Ipv4Addr;
+use std::process::Command;
 
-#[derive(Clone)]
-pub struct RemoteComputerSystem {
-    computer_system: ComputerSystem,
-    address: Ipv4Addr,
-}
-
-impl RemoteComputerSystem {
-    pub fn new(computer_system: ComputerSystem, address: Ipv4Addr) -> Self {
-        Self {
-            computer_system,
-            address,
-        }
-    }
-
-    pub async fn status(&mut self) -> ComputerSystem {
-        self.computer_system.power_state = ping::ping(self.address).await;
-        self.computer_system.clone()
-    }
+pub async fn ping(address: Ipv4Addr) -> bool {
+    // I'm lazy, so I'm just going to fork to ping(1) here.
+    let result = Command::new("ping")
+        .arg("-c1")
+        .arg("-W1")
+        .arg(address.to_string().as_str())
+        .status()
+        .expect("Failed to execute ping");
+    return result.success();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
